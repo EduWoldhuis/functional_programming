@@ -24,6 +24,13 @@ sort f l u | l == u    = l
 --                 where
 --                   y = calcDown x
 
+
+lookUp (x:xs) s | not(x == s) = 1 + (lookUp xs s)
+                | otherwise = 0
+
+
+countSpace input = length (filter (==' ') input)
+
 printX :: String -> Int -> String
 printX str 1 = str
 printX str i = str ++ printX str (i-1)
