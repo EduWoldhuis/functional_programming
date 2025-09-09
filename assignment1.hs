@@ -67,19 +67,40 @@ columnWidths l = map maximum (transpose ((map . map) length l))
 
 printTable :: Table -> [String]
 printTable table@(header:rows)
-    = map printRow (map (zip widths) table) ++ (printLine table)
+    = filler ++ start ++ filler ++ mid ++ filler
     where widths = columnWidths table
+          filler = [printLine (columnWidths table)]
+          mid    = map printRow (map (zip widths) rows)
+          start  = [printRow (zip widths header)]
 
 -- | Querying
 
 -- * Exercise 7
+findString :: (Eq a) => [a] -> [a] -> Maybe Int
+findString search str = findIndex (isPrefixOf search) (tails str)
+
+
 
 select :: Field -> Field -> Table -> Table
 select column value table@(header:rows)
-    = undefined
+    = case x of 
+      Just i  -> [header] ++ filter (\row -> row !! i ==value) rows
+      Nothing -> table
+    where
+      x = elemIndex column header
 
 -- * Exercise 8
 
 project :: [Field] -> Table -> Table
-project columns table@(header:_)
-    = undefined
+project columns table = transpose (projectHelper columns table)
+
+projectHelper :: [Field] -> Table -> Table
+projectHelper columns table@(header:_)
+    | columns == [] = []
+    | pos == -1 = projectHelper (tail columns) table
+    | otherwise = [rows !! pos] ++ projectHelper (tail columns) table
+    where 
+      rows     = transpose table
+      maybePos = elemIndex (head columns) header
+      pos      = maybe (-1) id maybePos
+
